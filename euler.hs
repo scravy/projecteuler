@@ -2,37 +2,56 @@ import Data.Char
 import Data.Function
 import Data.List
 
-fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+-- utilities
+println  = putStrLn . show
+readNums = map (map read . words) . lines
+nodup    = map head . group . sort
 
+-- math
+divisibleBy d q = d `rem` q == 0
+factorial n = product [ 1 .. n ]
+choose n k = factorial n `quot` (factorial k * (factorial (n - k)))
 isqrt n = head $ dropWhile (\x -> x * x > n)
                $ iterate (\x -> (x + n `quot` x) `quot` 2) (n `quot` 2)
 
-primes = 2 : filter (\x -> all (\p -> x `rem` p /= 0) (takeWhile (<= isqrt x) primes)) [ 3 .. ]
+-- sequences
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+primes = 2 : filter (\x -> all (not . (x `divisibleBy`)) (takeWhile (<= isqrt x) primes)) [ 3 .. ]
+triangleNums = 1 : 3 : zipWith (+) [ 3 .. ] (tail triangleNums)
 
+-- predicates
 isPrime n = n == head (dropWhile (< n) primes)
-
 isPalindrome n = show n == (reverse . show) n
 
-factors n = filter (\p -> n `rem` p == 0) (takeWhile (<= n `quot` 2) primes)
-
+primeFactors = nodup . factorize
 factorize n = if null fs then [n] else fs
  where
-  fs = h n (takeWhile (<= n `quot` 2) primes)
-  h _ [] = []
-  h x fs@(f : ft)
-    | r == 0    = f : h q fs
-    | otherwise = h x ft
+  fs = fact n primes
+  fact _ [] = []
+  fact 1 _  = []
+  fact x fs@(f : ft)
+    | r == 0    = f : fact q fs
+    | otherwise = fact x ft
    where (q, r) = quotRem x f
 
 factorize2 = map (\xs -> (head xs, length xs)) . group . factorize
 
-euler1 = sum [ x | x <- [ 1 .. 999 ], x `rem` 3 == 0 || x `rem` 5 == 0 ]
+divisors 1 = [1]
+divisors n = 1 : ds ++ (dropWhile (== sr) $ reverse $ (n : map (n `quot`) ds))
+ where
+  sr = isqrt n
+  ds = filter (n `divisibleBy`) [ 2 .. sr ]
+
+properDivisors = init . divisors
+
+euler1 = sum [ x | x <- [ 1 .. 999 ], x `divisibleBy` 3 || x `divisibleBy` 5 ]
 
 euler2 = sum $ filter even $ takeWhile (<= 4000000) fibs
 
-euler3 = maximum $ factors 600851475143
+euler3 = maximum $ primeFactors 600851475143
 
-euler4 = maximum [ x * y | x <- [ 100 .. 999 ], y <- [ x .. 999 ], isPalindrome (x * y) ]
+euler4 = maximum [ x * y | x <- [ 100 .. 999 ], y <- [ x .. 999 ],
+                           isPalindrome (x * y) ]
 
 combined = foldr (combine max) [] . map factorize2
  where
@@ -49,67 +68,35 @@ euler6 = (^ 2) (sum [ 1 .. 100 ]) - sum (map (^ 2) [ 1 .. 100 ])
 
 euler7 = primes !! 10000
 
-euler8 = do
-  f <- digits <$> readFile "euler8.txt"
-  putStrLn $ show $ maximum (map product (groups 13 f))
+euler8 = digits <$> readFile "euler8.txt" >>= println . maxProduct
  where
-  groups n = filter ((== n) . length) . map (take n) . tails
-  digits = map ((\x -> x - ord '0') . ord) . filter isDigit
+  maxProduct = maximum . map product . groups 13
+  groups n   = filter ((== n) . length) . map (take n) . tails
+  digits     = map ((\x -> x - ord '0') . ord) . filter isDigit
 
 euler9 = head [ a * b * c | a <- [ 1 .. 999 ], b <- [ succ a .. 999 ],
                             c <- [ 1000 - (a + b) ], a ^ 2 + b ^ 2 == c ^ 2 ]
 
 euler10 = sum $ takeWhile (< 2000000) primes
 
-euler11 = maximum [ product l | x <- [ 0 .. 16 ], y <- [ 0 .. 16 ],
-                                l <- [ vert x y, hori x y, diag1 x y, diag2 x y ] ]
+euler11 = readNums <$> readFile "euler11.txt" >>= println . f
  where
-  vert  x y = line [ x .. x + 3 ] (repeat y)
-  hori  x y = line [ y .. y + 3 ] (repeat x)
-  diag1 x y = line [ x .. x + 3 ] [ y .. y + 3 ]
-  diag2 x y = line [ x .. x + 3 ] (reverse [ y .. y + 3 ])
-  line xs ys = map pick $ zip xs ys
-  pick (x, y) = grid !! x !! y
-  grid = (map (map read . words) . lines)
-    "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08\n\
-    \49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00\n\
-    \81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65\n\
-    \52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91\n\
-    \22 31 16 71 51 67 63 89 41 92 36 54 22 40 40 28 66 33 13 80\n\
-    \24 47 32 60 99 03 45 02 44 75 33 53 78 36 84 20 35 17 12 50\n\
-    \32 98 81 28 64 23 67 10 26 38 40 67 59 54 70 66 18 38 64 70\n\
-    \67 26 20 68 02 62 12 20 95 63 94 39 63 08 40 91 66 49 94 21\n\
-    \24 55 58 05 66 73 99 26 97 17 78 78 96 83 14 88 34 89 63 72\n\
-    \21 36 23 09 75 00 76 44 20 45 35 14 00 61 33 97 34 31 33 95\n\
-    \78 17 53 28 22 75 31 67 15 94 03 80 04 62 16 14 09 53 56 92\n\
-    \16 39 05 42 96 35 31 47 55 58 88 24 00 17 54 24 36 29 85 57\n\
-    \86 56 00 48 35 71 89 07 05 44 44 37 44 60 21 58 51 54 17 58\n\
-    \19 80 81 68 05 94 47 69 28 73 92 13 86 52 17 77 04 89 55 40\n\
-    \04 52 08 83 97 35 99 16 07 97 57 32 16 26 26 79 33 27 98 66\n\
-    \88 36 68 87 57 62 20 72 03 46 33 67 46 55 12 32 63 93 53 69\n\
-    \04 42 16 73 38 25 39 11 24 94 72 18 08 46 29 32 40 62 76 36\n\
-    \20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16\n\
-    \20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54\n\
-    \01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48"
+  f grid = maximum [ product l | x <- [ 0 .. 16 ], y <- [ 0 .. 16 ],
+                                 l <- [ vert x y, hori x y, diag1 x y, diag2 x y ] ]
+   where
+    vert  x y   = line [ x .. x + 3 ] (repeat y)
+    hori  x y   = line [ y .. y + 3 ] (repeat x)
+    diag1 x y   = line [ x .. x + 3 ] [ y .. y + 3 ]
+    diag2 x y   = line [ x .. x + 3 ] (reverse [ y .. y + 3 ])
+    line  xs ys = map pick $ zip xs ys
+    pick (x, y) = grid !! x !! y
 
-divisors 1 = [1]
-divisors n = 1 : ds ++ (dropWhile (== sr) $ reverse $ (n : map (n `quot`) ds))
- where
-  sr = isqrt n
-  ds = filter (\x -> n `rem` x == 0) [ 2 .. sr ]
-
-triangleNumbers = 1 : 3 : zipWith (+) [ 3 .. ] (tail triangleNumbers)
-
-euler12 = fst $ head $ dropWhile f $ zip triangleNumbers (map divisors triangleNumbers)
+euler12 = fst $ head $ dropWhile f $ zip triangleNums (map divisors triangleNums)
  where f (n, ds) = length ds <= 500
 
 euler13 = do
   s <- (map read . lines) <$> readFile "euler13.txt"
   putStrLn (take 10 $ show (sum s))
-
-factorial n = product [ 1 .. n ]
-
-choose n k = factorial n `quot` (factorial k * (factorial (n - k)))
 
 euler15 = 40 `choose` 20
 
