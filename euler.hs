@@ -6,6 +6,11 @@ import Data.List
 println  = putStrLn . show
 readNums = map (map read . words) . lines
 nodup    = map head . group . sort
+digits   = map ((\x -> x - ord '0') . ord) . filter isDigit
+tell n   = 
+ where
+  n10 = words "zero one two three four five six seven eight nine"
+  n100 = words "ten twenty thirty fourty fifty sixty seventy eighty ninety"
 
 -- math
 divisibleBy d q = d `rem` q == 0
@@ -14,16 +19,8 @@ choose n k = factorial n `quot` (factorial k * (factorial (n - k)))
 isqrt n = head $ dropWhile (\x -> x * x > n)
                $ iterate (\x -> (x + n `quot` x) `quot` 2) (n `quot` 2)
 
--- sequences
-fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
-primes = 2 : filter (\x -> all (not . (x `divisibleBy`)) (takeWhile (<= isqrt x) primes)) [ 3 .. ]
-triangleNums = 1 : 3 : zipWith (+) [ 3 .. ] (tail triangleNums)
-
--- predicates
-isPrime n = n == head (dropWhile (< n) primes)
-isPalindrome n = show n == (reverse . show) n
-
 primeFactors = nodup . factorize
+
 factorize n = if null fs then [n] else fs
  where
   fs = fact n primes
@@ -43,6 +40,15 @@ divisors n = 1 : ds ++ (dropWhile (== sr) $ reverse $ (n : map (n `quot`) ds))
   ds = filter (n `divisibleBy`) [ 2 .. sr ]
 
 properDivisors = init . divisors
+
+-- sequences
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+primes = 2 : filter (\x -> all (not . (x `divisibleBy`)) (takeWhile (<= isqrt x) primes)) [ 3 .. ]
+triangleNums = 1 : 3 : zipWith (+) [ 3 .. ] (tail triangleNums)
+
+-- predicates
+isPrime n = n == head (dropWhile (< n) primes)
+isPalindrome n = show n == (reverse . show) n
 
 euler1 = sum [ x | x <- [ 1 .. 999 ], x `divisibleBy` 3 || x `divisibleBy` 5 ]
 
@@ -72,7 +78,6 @@ euler8 = digits <$> readFile "euler8.txt" >>= println . maxProduct
  where
   maxProduct = maximum . map product . groups 13
   groups n   = filter ((== n) . length) . map (take n) . tails
-  digits     = map ((\x -> x - ord '0') . ord) . filter isDigit
 
 euler9 = head [ a * b * c | a <- [ 1 .. 999 ], b <- [ succ a .. 999 ],
                             c <- [ 1000 - (a + b) ], a ^ 2 + b ^ 2 == c ^ 2 ]
@@ -99,6 +104,8 @@ euler13 = do
   putStrLn (take 10 $ show (sum s))
 
 euler15 = 40 `choose` 20
+
+euler16 = sum (digits (show (2 ^ 1000)))
 
 maximumPathSum fileName = do
   rows <- (map (map read . words) . lines) <$> readFile fileName
