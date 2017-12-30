@@ -119,8 +119,22 @@ euler12 = fst $ head $ dropWhile f $ zip triangleNumbers (map divisors triangleN
  where f (n, ds) = length ds <= 500
 
 euler13 = do
-    s <- (map read . lines) <$> readFile "euler13.txt"
-    putStrLn (take 10 $ show (sum s))
+  s <- (map read . lines) <$> readFile "euler13.txt"
+  putStrLn (take 10 $ show (sum s))
+
+factorial n = product [ 1 .. n ]
+
+choose n k = factorial n `quot` (factorial k * (factorial (n - k)))
+
+euler15 = 40 `choose` 20
+
+maximumPathSum fileName = do
+  rows <- (map (map read . words) . lines) <$> readFile fileName
+  putStrLn (show (maximum (foldl f [] rows)))
+ where
+  f as bs = map (uncurry max) (zip (zipWith (+) (0 : as) bs) (zipWith (+) (as ++ [0]) bs))
+
+euler18 = maximumPathSum "euler18.txt"
 
 euler25 = fst $ head $ dropWhile ((< 10 ^ 999) . snd) $ zip [ 0 .. ] fibs
 
@@ -128,4 +142,6 @@ euler27 = let (a, b) = fst (maximumBy (compare `on` snd) ns) in a * b
  where
   fs = [ ((a, b), \n -> n ^ 2 + a * n + b) | a <- [ -999 .. 999 ], b <- [ -1000 .. 1000 ] ]
   ns = map (\f -> (fst f, length $ takeWhile isPrime $ map (snd f) [ 0 .. ])) fs
+
+euler67 = maximumPathSum "euler67.txt"
 
