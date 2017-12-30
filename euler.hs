@@ -124,6 +124,8 @@ euler 17 = return $ toInteger $ length $ filter isLetter $ concatMap tell [ 1 ..
 
 euler 18 = maximumPathSum <$> readFile "euler18.txt"
 
+euler 20 = return $ sum $ digits $ show $ factorial 100
+
 euler 25 = return $ fst $ head $ dropWhile ((< 10 ^ 999) . snd) $ zip [ 0 .. ] fibs
 
 euler 27 = return $ a * b
