@@ -4,7 +4,8 @@ import Data.List
 
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
 
-isqrt n = head $ dropWhile (\x -> x * x > n) $ iterate (\x -> (x + n `quot` x) `quot` 2) (n `quot` 2)
+isqrt n = head $ dropWhile (\x -> x * x > n)
+               $ iterate (\x -> (x + n `quot` x) `quot` 2) (n `quot` 2)
 
 primes = 2 : filter (\x -> all (\p -> x `rem` p /= 0) (takeWhile (<= isqrt x) primes)) [ 3 .. ]
 
@@ -44,14 +45,14 @@ combined = foldr (combine max) [] . map factorize2
 
 euler5 = product $ map (\(f, n) -> f ^ n) (combined [ 2 .. 20 ])
 
-euler6 = (^ 2) (sum [1 .. 100]) - sum (map (^ 2) [1 .. 100])
+euler6 = (^ 2) (sum [ 1 .. 100 ]) - sum (map (^ 2) [ 1 .. 100 ])
 
 euler7 = primes !! 10000
 
 euler8 = maximum (map product (groups 13))
  where
   groups n = filter ((== n) . length) $ map (take n) $ tails digits
-  digits = map ((\x -> x - ord '0') . ord) n
+  digits = map ((\x -> x - ord '0') . ord) (filter isDigit n)
   n = "73167176531330624919225119674426574742355349194934\
       \96983520312774506326239578318016984801869478851843\ 
       \85861560789112949495459501737958331952853208805511\
@@ -73,14 +74,16 @@ euler8 = maximum (map product (groups 13))
       \05886116467109405077541002256983155200055935729725\
       \71636269561882670428252483600823257530420752963450"
 
-euler9 = head [ a * b * c | a <- [ 1 .. 999 ], b <- [ succ a .. 999 ], c <- [ 1000 - (a + b) ], a ^ 2 + b ^ 2 == c ^ 2 ]
+euler9 = head [ a * b * c | a <- [ 1 .. 999 ], b <- [ succ a .. 999 ],
+                            c <- [ 1000 - (a + b) ], a ^ 2 + b ^ 2 == c ^ 2 ]
 
 euler10 = sum $ takeWhile (< 2000000) primes
 
-euler11 = maximum [ product l | x <- [ 0 .. 16 ], y <- [ 0 .. 16 ], l <- [ vert x y, hori x y, diag1 x y, diag2 x y ] ]
+euler11 = maximum [ product l | x <- [ 0 .. 16 ], y <- [ 0 .. 16 ],
+                                l <- [ vert x y, hori x y, diag1 x y, diag2 x y ] ]
  where
-  vert x y = line [ x .. x + 3 ] (repeat y)
-  hori x y = line [ y .. y + 3 ] (repeat x)
+  vert  x y = line [ x .. x + 3 ] (repeat y)
+  hori  x y = line [ y .. y + 3 ] (repeat x)
   diag1 x y = line [ x .. x + 3 ] [ y .. y + 3 ]
   diag2 x y = line [ x .. x + 3 ] (reverse [ y .. y + 3 ])
   line xs ys = map pick $ zip xs ys
