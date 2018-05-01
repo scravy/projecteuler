@@ -2,4 +2,13 @@
 .*.swp
 *.hi
 *.o
-euler
+/euler
+/target/
+*.log
+.DS_Store
+/.idea/
+*.iml
+/pom.xml.releaseBackup
+/release.properties
+.idea
+primes.bin.gz
