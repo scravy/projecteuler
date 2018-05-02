@@ -2,7 +2,9 @@ package de.scravy.euler;
 
 import com.google.common.io.ByteStreams;
 import com.simplaex.bedrock.Try;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
+import de.scravy.primes.Primes;
+import it.unimi.dsi.fastutil.ints.IntAVLTreeSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.reflections.Reflections;
 
 import java.io.BufferedReader;
@@ -11,25 +13,63 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("CodeBlock2Expr")
 @FunctionalInterface
 public interface Euler {
 
   BigInteger run();
 
-  static void print(final Object obj) {
+  default void print(final Object obj) {
     System.out.print(obj);
   }
 
-  static void println(final Object obj) {
+  default void println(final Object obj) {
     System.out.println(obj);
+  }
+
+  default void printf(final String format, final Object... args) {
+    System.out.printf(format, args);
+  }
+
+  default IntSet properDivisors(final int n) {
+    final int threshold = Primes.isqrt(n);
+    final IntAVLTreeSet divisors = new IntAVLTreeSet();
+    divisors.add(1);
+    for (int i = 2; i <= threshold; i += 1) {
+      if (n % i == 0) {
+        divisors.add(i);
+        divisors.add(n / i);
+      }
+    }
+    return divisors;
+  }
+
+  default IntSet divisors(final int n) {
+    final IntSet pd = properDivisors(n);
+    pd.add(n);
+    return pd;
+  }
+
+  enum PAD {
+    Perfect,
+    Abundant,
+    Deficient
+  }
+
+  default PAD classifyPAD(final int n) {
+    final IntSet pd = properDivisors(n);
+    final int s = pd.stream().mapToInt(x -> x).sum();
+    if (s == n) {
+      return PAD.Perfect;
+    } else if (s > n) {
+      return PAD.Abundant;
+    }
+    return PAD.Deficient;
   }
 
   static void main(final String... args) {
@@ -58,10 +98,10 @@ public interface Euler {
         n -> {
           final Class<? extends Euler> clazz = solutionsById.get(n);
           if (clazz == null) {
-            println("No solution to problem " + n);
+            System.out.println("No solution to problem " + n);
           } else {
             final Euler solution = Try.execute(clazz::newInstance).get();
-            System.out.println(solution.run());
+            solution.println(solution.run());
           }
         }
       );
@@ -87,10 +127,6 @@ public interface Euler {
       }, instance -> {
         System.out.println(instance.run());
       });
-  }
-
-  default IntArrayList getPrimeFactors(final int n) {
-    return Primes.get().getPrimeFactors(n);
   }
 
 }
