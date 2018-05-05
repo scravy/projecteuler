@@ -12,3 +12,4 @@
 /release.properties
 .idea
 primes.bin.gz
+dependency-reduced-pom.xml

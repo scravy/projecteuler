@@ -93,7 +93,7 @@ public interface Euler {
         })
       .consume(
         exc -> {
-          System.out.println("Failed to read the number of the problem to compulte the solution to.");
+          System.out.println("Failed to read the number of the problem to compute the solution to.");
         },
         n -> {
           final Class<? extends Euler> clazz = solutionsById.get(n);

@@ -4,6 +4,7 @@ import Data.Function
 import Data.List
 
 import System.Environment
+import System.Process
 
 -- utilities
 readNums = map (map read . words) . lines
@@ -144,6 +145,8 @@ euler 17 = return $ toInteger $ length $ filter isLetter $ concatMap tell [ 1 ..
 
 euler 18 = maximumPathSum <$> readFile "euler18.txt"
 
+euler 19 = return $ 1200 `div` 7
+
 euler 20 = return $ sum $ digits $ show $ factorial 100
 
 euler 21 = return $ sum [ toInteger i | i <- [ 2 .. 9999 ], isAmicable i ]
@@ -161,11 +164,6 @@ euler 22 = sum . zipWith (*) [ 1 .. ] . map alphabeticalValue . load <$> readFil
   load = sort . map (filter isAlpha) . lines . tr ',' '\n'
   alphabeticalValue = sum . map (toInteger . succ . flip (-) (ord 'A') . ord)
 
-euler 23 = return $ succ $ sum $ filter (not . canBe) [ 2 .. 28123 ]
- where
-  canBe n = any id $ map (\a -> n - a `elem` takeWhile (<= n) abundantNumbers)
-                   $ takeWhile (<= quot n 2) abundantNumbers
-
 euler 25 = return $ fst $ head $ dropWhile ((< 10 ^ 999) . snd) $ zip [ 0 .. ] fibs
 
 euler 27 = return $ a * b
@@ -174,16 +172,41 @@ euler 27 = return $ a * b
   fs = [ ((a, b), \n -> n ^ 2 + a * n + b) | a <- [ -999 .. 999 ], b <- [ -1000 .. 1000 ] ]
   ns = map (\f -> (fst f, length $ takeWhile isPrime $ map (snd f) [ 0 .. ])) fs
 
+euler 29 = return $ toInteger $ length $ group $ sort [ a ^ b | a <- [ 2 .. 100 ],
+                                                                b <- [ 2 .. 100 ]]
+
+euler 30 = return result
+ where
+  ds = [ 0 .. 9 ]
+  p  = 5
+  result = sum [ n | a <- ds, b <- ds, c <- ds, d <- ds, e <- ds, f <- ds,
+                     n <- [ a + b * 10 + c * 100 + d * 1000 + e * 10000 + f * 100000 ],
+                     n >= 10 && n == a ^ p + b ^ p + c ^ p + d ^ p + e ^ p + f ^ p ]
+
+euler 31 = return $ toInteger $ length $ fs 200 [ 200, 100, 50, 20, 10, 5, 2, 1 ]
+ where
+  fs n cs = case cs of
+    [] -> []
+    [1] -> [[(n, 1)]]
+    (x : xs) -> do
+      z <- zip [0 .. (n `div` x)] (repeat x)
+      map (z :) (fs (n - uncurry (*) z) xs)
+
 euler 67 = maximumPathSum <$> readFile "euler67.txt"
 
+euler n | n `elem` [14, 23, 26, 28, 48] = runJava n
+
+{-
 euler 69 = return $ fst $ maximumBy (compare `on` snd) $ reverse $ drop 2
                   $ zipWith zipper [ 0 .. 1000000 ] totients
  where
   zipper n b = (n, fromInteger n / fromInteger b)
+-}
 
 euler _  = return 0
 
-f max@(max_n, max_b) cur@(n, b) = if b > max_b then cur else max
+runJava :: Int -> IO Integer
+runJava n = read <$> readCreateProcess (shell $ "java -jar target/euler-1.jar " ++ show n) ""
 
 main = do
   problems <- map read <$> getArgs
@@ -191,4 +214,4 @@ main = do
     euler n >>= \r -> case r of
       0 -> return ()
       _ -> putStr (show n) >> putStr "\t" >> putStrLn (show r)
-  
+
