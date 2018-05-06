@@ -206,7 +206,7 @@ euler 69 = return $ fst $ maximumBy (compare `on` snd) $ reverse $ drop 2
 euler _  = return 0
 
 runJava :: Int -> IO Integer
-runJava n = read <$> readCreateProcess (shell $ "java -jar target/euler-1.jar " ++ show n) ""
+runJava n = read <$> readCreateProcess (shell $ "java -jar euler.jar " ++ show n) ""
 
 main = do
   problems <- map read <$> getArgs

@@ -43,3 +43,4 @@ public class Euler14 implements Euler {
     return max;
   }
 }
+
