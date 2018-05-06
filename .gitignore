@@ -13,3 +13,5 @@
 .idea
 primes.bin.gz
 dependency-reduced-pom.xml
+dist/
+*.jar
