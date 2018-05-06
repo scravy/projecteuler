@@ -2,6 +2,7 @@ import Data.Array.Unboxed
 import Data.Char
 import Data.Function
 import Data.List
+import Data.Ratio
 
 import System.Environment
 import System.Process
@@ -70,6 +71,9 @@ totients = 0 : 1 : map totient [ 2 .. ]
     [(p, k)] -> p ^ k - p ^ (k - 1)
     factors -> product (map (phi . (\(p, k) -> p ^ k)) factors)
 
+fak digit = case digit of
+  '0' -> 1; '1' -> 1; '2' -> 2; '3' -> 6; '4' -> 24; '5' -> 120; '6' -> 720; '7' -> 5040; '8' -> 40320; '9' -> 362880
+
 phi = (totients !!) . fromInteger
 
 -- sequences
@@ -81,10 +85,13 @@ abundantNumbers = [ x | x <- [2 .. ], let s = sum (properDivisors x) in s > x ]
 -- predicates
 isPrime n = n == head (dropWhile (< n) primes)
 isPalindrome n = show n == (reverse . show) n
+isPandigital xs = sort (xs >>= show) == "123456789"
 
 maximumPathSum = maximum . foldl f [] . readNums
  where
   f as bs = map (uncurry max) (zip (zipWith (+) (0 : as) bs) (zipWith (+) (as ++ [0]) bs))
+
+euler n | n `elem` javaProblems = runJava n
 
 euler 1 = return $ sum [ x | x <- [ 1 .. 999 ], x `divisibleBy` 3 || x `divisibleBy` 5 ]
 
@@ -192,9 +199,15 @@ euler 31 = return $ toInteger $ length $ fs 200 [ 200, 100, 50, 20, 10, 5, 2, 1 
       z <- zip [0 .. (n `div` x)] (repeat x)
       map (z :) (fs (n - uncurry (*) z) xs)
 
-euler 67 = maximumPathSum <$> readFile "euler67.txt"
+euler 32 = return $ sum $ nub $ f 1 9 1234 9876 ++ f 12 98 123 987
+ where
+  f a b c d = [ z | x <- [ a .. b ], y <- [ c .. d ], z <- [ x * y ], isPandigital [x, y, z] ]
 
-euler n | n `elem` [14, 23, 26, 28, 48] = runJava n
+euler 33 = return $ denominator $ product [ n % d | x <- [1..9], y <- [1..9], z <- [1..9], n <- [x*10+y], d <- [y*10+z], n < d, n%d == x%z]
+
+euler 34 = return $ sum [ x | x <- [10 .. 100000], (sum . map fak . show) x == x ]
+
+euler 67 = maximumPathSum <$> readFile "euler67.txt"
 
 {-
 euler 69 = return $ fst $ maximumBy (compare `on` snd) $ reverse $ drop 2
@@ -203,7 +216,9 @@ euler 69 = return $ fst $ maximumBy (compare `on` snd) $ reverse $ drop 2
   zipper n b = (n, fromInteger n / fromInteger b)
 -}
 
-euler _  = return 0
+euler _ = return 0
+
+javaProblems = [ 14, 23, 26, 28, 48 ]
 
 runJava :: Int -> IO Integer
 runJava n = read <$> readCreateProcess (shell $ "java -jar euler.jar " ++ show n) ""
