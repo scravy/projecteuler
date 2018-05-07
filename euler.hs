@@ -222,6 +222,10 @@ euler 35 = return $ toInteger $ length $ filter (all (`elem` ps) . rotations) ps
 
 euler 36 = return $ sum [ x | x <- [ 1 .. 999999 ], isPalindrome x && isPalindromeAtBase 2 x ]
 
+euler 37 = return $ sum $ take 11 [ p | p <- drop 4 primes, f tails p && f inits p ]
+ where
+  f g = all isPrime . map read . init . tail . g . show
+
 euler 67 = maximumPathSum <$> readFile "euler67.txt"
 
 {-
