@@ -4,6 +4,8 @@ import Data.Function
 import Data.List
 import Data.Ratio
 
+import Numeric
+
 import System.Environment
 import System.Process
 
@@ -74,6 +76,11 @@ totients = 0 : 1 : map totient [ 2 .. ]
 fak digit = case digit of
   '0' -> 1; '1' -> 1; '2' -> 2; '3' -> 6; '4' -> 24; '5' -> 120; '6' -> 720; '7' -> 5040; '8' -> 40320; '9' -> 362880
 
+rotations' xs = [ drop n xs ++ take n xs | n <- [ 1 .. pred $ length xs ] ]
+
+rotations :: (Show a, Read a) => a -> [a]
+rotations = map read . rotations' . show
+
 phi = (totients !!) . fromInteger
 
 -- sequences
@@ -85,6 +92,8 @@ abundantNumbers = [ x | x <- [2 .. ], let s = sum (properDivisors x) in s > x ]
 -- predicates
 isPrime n = n == head (dropWhile (< n) primes)
 isPalindrome n = show n == (reverse . show) n
+isPalindromeAtBase b n = let s = showIntAtBase b (head . show) n "" in s == reverse s
+
 isPandigital xs = sort (xs >>= show) == "123456789"
 
 maximumPathSum = maximum . foldl f [] . readNums
@@ -206,6 +215,12 @@ euler 32 = return $ sum $ nub $ f 1 9 1234 9876 ++ f 12 98 123 987
 euler 33 = return $ denominator $ product [ n % d | x <- [1..9], y <- [1..9], z <- [1..9], n <- [x*10+y], d <- [y*10+z], n < d, n%d == x%z]
 
 euler 34 = return $ sum [ x | x <- [10 .. 100000], (sum . map fak . show) x == x ]
+
+euler 35 = return $ toInteger $ length $ filter (all (`elem` ps) . rotations) ps
+ where
+  ps = takeWhile (< 1000000) primes
+
+euler 36 = return $ sum [ x | x <- [ 1 .. 999999 ], isPalindrome x && isPalindromeAtBase 2 x ]
 
 euler 67 = maximumPathSum <$> readFile "euler67.txt"
 
