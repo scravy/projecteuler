@@ -1,27 +1,40 @@
+use std::collections::BTreeMap;
+use std::cmp::max;
+
+type Num = u32;
+
 fn main() {
+    let mut factors: BTreeMap<Num, Num> = BTreeMap::new();
+    for i in 1 ..= 20 {
+        merge_into(factorize(i), &mut factors);
+    }
+    let mut r: Num = 1;
+    for (k, v) in factors {
+        r *= k.pow(v);
+    }
+    println!("{:?}", r);
+}
 
-    /* 1    1
-     * 2    2
-     * 3    3
-     * 4    2 2
-     * 5    5
-     * 6    2 3
-     * 7    7
-     * 8    2 2 2
-     * 9    3 3
-     * 10   2 5
-     * 11   11
-     * 12   2 2 3
-     * 13   13
-     * 14   2 7
-     * 15   3 5
-     * 16   2 2 2 2
-     * 17   17
-     * 18   2 3 3
-     * 19   19
-     * 20   2 2 5
-     */
+fn merge_into(map: BTreeMap<Num, Num>, into: &mut BTreeMap<Num, Num>) {
+    for (k, v) in map {
+        let value = match into.get(&k) {
+            Some(value) => max(*value, v),
+            _           => v,
+        };
+        into.insert(k, value);
+    }
+}
 
-    let r: u64 = 2 * 2 * 2 * 2 * 3 * 3 * 5 * 7 * 11 * 13 * 17 * 19;
-    println!("{}", r);
+fn factorize(mut n: Num) -> BTreeMap<Num, Num> {
+    let mut factors: BTreeMap<Num, Num> = BTreeMap::new();
+    let mut f = 2;
+    while n > 1 {
+        if n % f == 0 {
+            n /= f;
+            *factors.entry(f).or_insert(0) += 1;
+        } else {
+            f += 1;
+        }
+    }
+    factors
 }
