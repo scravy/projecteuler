@@ -13,8 +13,8 @@ fn ispalindrome(n: u64) -> bool {
 
 fn main() {
     let mut r = 0;
-    for i in (100 .. 1000).rev() {
-        for j in (i .. 1000).rev() {
+    for i in (100..1000).rev() {
+        for j in (i..1000).rev() {
             let n = i * j;
             if n > r {
                 if ispalindrome(n) {
