@@ -22,8 +22,12 @@ fn main() {
         05886116467109405077541002256983155200055935729725\
         71636269561882670428252483600823257530420752963450";
 
-    for c in s.chars() {
-        print!("{}", c);
+    if let Some(r) = (13..=s.len()).map(|i| {
+        s[(i-13)..i]
+            .chars()
+            .map(|c| c.to_digit(10).unwrap_or(0) as u64)
+            .product::<u64>()
+    }).max() {
+        println!("{}", r);
     }
-    println!();
 }
