@@ -1,4 +1,4 @@
 run:
-	@cargo run -q
+	@cargo run --release -q
 
 .PHONY: run
