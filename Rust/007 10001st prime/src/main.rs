@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 type Num = u64;
 
 fn main() {
-    let mut primes: BTreeSet<Num>= BTreeSet::new();
+    let mut primes: BTreeSet<Num> = BTreeSet::new();
     let mut n: Num = 1;
     'outer: while primes.len() < 10001 {
         n += 1;
