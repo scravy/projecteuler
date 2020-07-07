@@ -1,13 +1,13 @@
 use std::collections::BTreeSet;
 
-fn f<F>(r: &mut BTreeSet<i32>, n: i32, p: usize, max: usize, c: &F) -> bool
+fn f<F>(r: &mut BTreeSet<i32>, n: i32, p: i32, max: i32, c: &F) -> bool
 where
     F: Fn(i32) -> bool,
 {
     if p == max {
         return c(n);
     }
-    for i in (1..=9).rev() {
+    for i in (1..=max).rev() {
         if r.contains(&i) {
             r.remove(&i);
             if f(r, n * 10 + i, p + 1, max, c) {
@@ -34,7 +34,7 @@ fn main() {
         for i in 1..=n {
             r.insert(i);
         }
-        if f(&mut r, 0, 0, n as usize, &|x| {
+        if f(&mut r, 0, 0, n, &|x| {
             if is_prime(x) {
                 println!("{}", x);
                 return true;
