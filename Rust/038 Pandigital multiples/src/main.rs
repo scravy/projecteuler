@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 use std::string::String;
 
-fn f<F>(r: &mut BTreeSet<i32>, n: i32, p: usize, c: &F) -> bool
+fn f<F>(r: &mut BTreeSet<i32>, n: i32, p: i32, c: &F) -> bool
 where
     F: Fn(i32) -> bool,
 {
