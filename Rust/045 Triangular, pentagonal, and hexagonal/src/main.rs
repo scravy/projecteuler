@@ -29,7 +29,7 @@ fn main() {
             penta += penta_diff;
             penta_ix += 1;
             penta_diff += 3;
-        } else if hexa <= tri && hexa <= penta {
+        } else {
             hexa += hexa_diff;
             hexa_ix += 1;
             hexa_diff += 4;
