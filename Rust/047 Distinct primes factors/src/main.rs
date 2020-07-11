@@ -47,9 +47,6 @@ pub fn reset_signal_pipe_handler() {
     {
         use nix::sys::signal;
 
-        let _err = unsafe {
-            signal::signal(signal::Signal::SIGPIPE, signal::SigHandler::SigDfl)
-        };
-        
+        let _err = unsafe { signal::signal(signal::Signal::SIGPIPE, signal::SigHandler::SigDfl) };
     }
 }
