@@ -47,7 +47,7 @@ fn comp() -> Option<usize> {
             s += p;
             it.next();
         } else {
-            ok = true;
+            ok = true; // this ok thing is a hack to reach the max
             s -= t.pop_front()?;
         }
         if ok && ps.contains(&s) {
