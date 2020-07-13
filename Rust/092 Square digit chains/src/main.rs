@@ -17,7 +17,7 @@ fn judge(map: &mut HashMap<usize, usize>, n: usize) -> usize {
             let r = judge(map, m);
             map.insert(n, r);
             r
-        },
+        }
     }
 }
 
